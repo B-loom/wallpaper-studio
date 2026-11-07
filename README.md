@@ -105,6 +105,30 @@ and run the installer.
 Windows will warn you that the application is not signed by a paid
 certificate. Choose **More info** → **Run anyway**.
 
+### Uninstalling
+
+Three ways — they all run the same uninstaller:
+
+1. **Start menu** — type `Wallpaper Studio` in Windows search and click
+   **Uninstall Wallpaper Studio**.
+2. **Windows Settings** — **Settings** → **Apps** → **Installed apps** → find
+   **Wallpaper Studio** → `⋯` → **Uninstall**.
+3. **Directly, if you cannot find it** — paste this into the Windows search bar
+   or the Run dialog (`Win + R`):
+
+   ```
+   "%LOCALAPPDATA%\Programs\WallpaperStudio\unins000.exe"
+   ```
+
+The uninstaller closes the application, removes the program files, the
+shortcuts, the start-with-Windows entry, and the logs, cache and thumbnails.
+It then **asks** whether to delete your library, settings and schedule rules —
+the default answer is **No**, so nothing personal is lost by accident. Answer
+No if you plan to reinstall.
+
+Once uninstalled, the animated wallpaper stops and Windows returns to your
+usual static wallpaper.
+
 ### Building from source
 
 ```bat
@@ -280,6 +304,32 @@ et lancez l'installateur.
 Windows affichera un avertissement, l'application n'étant pas signée par un
 certificat payant : choisissez **Informations complémentaires** → **Exécuter
 quand même**.
+
+### Désinstaller
+
+Trois façons — elles lancent toutes le même désinstalleur :
+
+1. **Menu Démarrer** — tapez `Wallpaper Studio` dans la recherche Windows et
+   cliquez sur **Désinstaller Wallpaper Studio**.
+2. **Paramètres Windows** — **Paramètres** → **Applications** →
+   **Applications installées** → cherchez **Wallpaper Studio** → `⋯` →
+   **Désinstaller**.
+3. **Directement, si vous ne le trouvez pas** — collez ceci dans la barre de
+   recherche Windows ou dans Exécuter (`Win + R`) :
+
+   ```
+   "%LOCALAPPDATA%\Programs\WallpaperStudio\unins000.exe"
+   ```
+
+Le désinstalleur ferme l'application, retire les fichiers du programme, les
+raccourcis, l'entrée de démarrage automatique, ainsi que les journaux, le cache
+et les vignettes. Il **demande ensuite** si vous voulez supprimer votre
+bibliothèque, vos réglages et vos règles horaires — la réponse par défaut est
+**Non**, pour ne rien perdre par accident. Répondez Non si vous comptez
+réinstaller.
+
+Une fois désinstallé, le fond animé s'arrête et Windows revient à votre fond
+statique habituel.
 
 ### Compiler depuis les sources
 
