@@ -1,0 +1,26 @@
+# Wallpaper Studio - dependances
+#
+# Python 3.11 requis : PySide6 6.12 ne publie pas encore de roue pour
+# Python 3.14. Installation :
+#     py -3.11 -m venv .venv
+#     .venv\Scripts\python.exe -m pip install -r requirements.txt
+
+# Interface graphique, rendu et QtWebEngine (fonds d'ecran web)
+PySide6==6.12.0
+
+# Traitement des images : JPEG, PNG, APNG, WEBP anime, GIF
+Pillow>=11.0,<14
+
+# Lecture video : liaison vers libVLC (VLC 64 bits doit etre installe,
+# ou embarque via scripts/build.py --with-vlc)
+python-vlc>=3.0.20
+
+# Mesures de memoire et de charge processeur (page Performances)
+psutil>=6.0
+
+# API Windows complementaires
+pywin32>=306
+
+# --- Developpement uniquement ---------------------------------------------
+pytest>=8.0        # suite de tests
+pyinstaller>=6.10  # construction de l'executable

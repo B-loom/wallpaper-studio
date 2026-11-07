@@ -1,0 +1,30 @@
+# Environnement Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Construction
+build/
+dist/
+*.spec
+
+# Donnees locales de l'application (mode portable)
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Outils
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Systeme
+Thumbs.db
+desktop.ini
+*.log
+
+# Fichiers temporaires de traduction
+resources/lang/_a_traduire.json
+resources/icons/apercu.png

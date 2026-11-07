@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Horloge Wallpaper Studio</title>
+<style>
+  :root {
+    --accent: #5b8dff;
+    --accent2: #8a5bff;
+    --texte: #e8ebf2;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    background: radial-gradient(circle at 30% 20%, #1b2340 0%, #0b0d14 60%, #06070b 100%);
+    color: var(--texte);
+    font-family: "Segoe UI", system-ui, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    cursor: none;
+  }
+  #halo {
+    position: fixed; width: 420px; height: 420px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(91,141,255,.16) 0%, rgba(91,141,255,0) 70%);
+    transform: translate(-50%, -50%); pointer-events: none;
+    left: -500px; top: -500px; transition: opacity .3s;
+  }
+  #centre { text-align: center; z-index: 2; }
+  #heure {
+    font-size: 9.5vw; font-weight: 200; letter-spacing: .04em;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(120deg, var(--accent), var(--accent2), #2bd9c4);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  #secondes { font-size: 2.2vw; opacity: .5; font-variant-numeric: tabular-nums; }
+  #date { font-size: 1.9vw; opacity: .72; margin-top: .6vw; text-transform: capitalize; }
+  canvas { position: fixed; inset: 0; z-index: 1; }
+  #centre > * { position: relative; z-index: 2; }
+</style>
+</head>
+<body>
+<canvas id="fond"></canvas>
+<div id="halo"></div>
+<div id="centre">
+  <div id="heure">--:--</div>
+  <div id="secondes">--</div>
+  <div id="date">chargement...</div>
+</div>
+
+<script>
+// --- Horloge ---------------------------------------------------------------
+const heure = document.getElementById('heure');
+const secondes = document.getElementById('secondes');
+const dateEl = document.getElementById('date');
+
+function majHorloge() {
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  heure.textContent = `${p(d.getHours())}:${p(d.getMinutes())}`;
+  secondes.textContent = p(d.getSeconds());
+  dateEl.textContent = d.toLocaleDateString('fr-FR', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+}
+majHorloge();
+setInterval(majHorloge, 1000);
+
+// --- Particules de fond ----------------------------------------------------
+const canvas = document.getElementById('fond');
+const ctx = canvas.getContext('2d');
+let particules = [];
+
+function dimensionner() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  // Densite proportionnelle a la surface, bornee pour rester econome.
+  const n = Math.min(90, Math.floor(canvas.width * canvas.height / 26000));
+  particules = Array.from({ length: n }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - .5) * 14,
+    vy: (Math.random() - .5) * 14,
+    r: Math.random() * 1.8 + .5
+  }));
+}
+dimensionner();
+window.addEventListener('resize', dimensionner);
+
+let dernier = performance.now();
+function boucle(maintenant) {
+  const dt = Math.min(.1, (maintenant - dernier) / 1000);
+  dernier = maintenant;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'rgba(140, 190, 255, .45)';
+  for (const p of particules) {
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    if (p.x < 0) p.x = canvas.width; if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height; if (p.y > canvas.height) p.y = 0;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+  }
+  requestAnimationFrame(boucle);
+}
+requestAnimationFrame(boucle);
+
+// --- Interactivite : position du curseur fournie par l'application ---------
+// L'application envoie un evenement « wps-souris » ; aucun acces direct au
+// systeme n'est accorde a cette page.
+const halo = document.getElementById('halo');
+window.addEventListener('wps-souris', e => {
+  halo.style.left = e.detail.x + 'px';
+  halo.style.top = e.detail.y + 'px';
+});
+</script>
+</body>
+</html>
