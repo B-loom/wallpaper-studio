@@ -273,12 +273,19 @@ class LibraryView(QWidget):
         if not folder:
             return
         found = scan_folder(folder)
+        nom = Path(folder).name or folder
+        log.info("Import de dossier : %s -> %s fichier(s) compatible(s)",
+                 folder, len(found))
         if not found:
-            self.notify.emit("Aucun media compatible dans ce dossier.", "alerte")
+            self.notify.emit(
+                f"Aucun media compatible dans « {nom} ».", "alerte"
+            )
             return
-        self._start_import(found)
+        # On nomme le dossier et le nombre de fichiers : c'est la seule facon
+        # de voir tout de suite qu'on s'est trompe de dossier.
+        self._start_import(found, source=nom)
 
-    def _ask_copy_mode(self, count: int) -> Optional[bool]:
+    def _ask_copy_mode(self, count: int, source: str = "") -> Optional[bool]:
         """Demande si les fichiers doivent etre copies. ``None`` = annule."""
         mode = self._settings.get("mode_import", IMPORT_DEMANDER)
         if mode == IMPORT_COPIER:
@@ -288,7 +295,11 @@ class LibraryView(QWidget):
 
         box = QMessageBox(self)
         box.setWindowTitle("Mode d'importation")
-        box.setText(f"Comment importer ces {count} fichier(s) ?")
+        # Sans cela, la boite peut rester derriere la fenetre et l'utilisateur
+        # croit que l'import n'a rien fait.
+        box.setWindowModality(Qt.ApplicationModal)
+        origine = f" trouve(s) dans « {source} »" if source else ""
+        box.setText(f"Comment importer ces {count} fichier(s){origine} ?")
         box.setInformativeText(
             "« Referencer » laisse vos fichiers ou ils sont : rien n'est duplique, "
             "mais deplacer un fichier le rendra introuvable.\n\n"
@@ -307,14 +318,20 @@ class LibraryView(QWidget):
             return True
         return None
 
-    def _start_import(self, paths: List[Path]) -> None:
+    def _start_import(self, paths: List[Path], source: str = "") -> None:
         if self._worker is not None and self._worker.isRunning():
             self.notify.emit("Une importation est deja en cours.", "alerte")
             return
 
-        copy = self._ask_copy_mode(len(paths))
+        copy = self._ask_copy_mode(len(paths), source)
         if copy is None:
+            log.info("Importation annulee par l'utilisateur (%s fichiers)", len(paths))
+            self.notify.emit(
+                "Importation annulee : aucun fond ajoute.", "alerte"
+            )
             return
+        log.info("Importation de %s fichier(s), mode %s",
+                 len(paths), "copie" if copy else "reference")
 
         self._progress.setRange(0, len(paths))
         self._progress.setValue(0)
@@ -334,6 +351,10 @@ class LibraryView(QWidget):
         self._status.setText(f"Importation {done}/{total} : {name}")
 
     def _on_import_done(self, added: int, errors: List[str]) -> None:
+        log.info("Importation terminee : %s ajoute(s), %s echec(s)",
+                 added, len(errors))
+        for message in errors[:10]:
+            log.warning("  echec d'import : %s", message)
         self._progress.hide()
         self._btn_files.setEnabled(True)
         self._btn_folder.setEnabled(True)
